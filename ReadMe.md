@@ -2,6 +2,25 @@
 __Runtime__: [3 days]: Sat, 0ct 4th, 2025 10:15am  - Tue, Oct 7th, 2025 10:15am
 
 
+
+### RUNNING THIS SOLUTION
+
+- [Standalone]: For Data Exploration and Analysis kindly run all cells of the `exploration.ipynb` notebook
+
+The following steps are related:  
+- [STEP 1]: Ensure you have `docker` installed and `docker-compose`.
+- [STEP 2]: Navigate to the sub-directory `<project-root>/duel-api`
+- [STEP 3]: Configure the `.env` file accordingly. This file has been filled for you, feel free to update it if you wish
+- [STEP 4]: Run `docker-compose up` via the terminal: This should set up the `postgresql database`, `pgAdmin` & `duel-api` services.
+- [STEP 5]: Navigate to the subdirectory `<project-root>/dispatcher-and-etl`
+- [STEP 6]: Configure the `.env` file accordingly. It is importannt that `DATA_FOLDER` points to the folder where the `JSON` files are stored while `QUARANTINE_FOLDER` points to a folder where JSON files may be moved to (ideally, it should be an empty directory, but not necessarily)
+- [STEP 7]: Ensure you have `python` and `pip3` installed and available in your `path`.
+- [STEP 8]: Run the command `pip3 install -r requirement.txt` to install all requirements
+- [STEP 9]: Run `python dispatcher.py` to run the dispatcher: This should scan all JSON file for structure and schema integrity
+- [STEP 10]: RUN `python pipeline.py` to run the ETL pipeline: This should transform the read files and store them in the `postgresql` database setup in [STEP 4] above
+- [STEP 11]: Using a browser, navigate to `http://localhost:3030` to access the dashboard
+- [STEP 12]: Access `http://localhost:3030/api` to access the API endpoints without the dashboatd
+
 ### SOME NOTES BEFORE YOU BEGIN
 
 #### Assumptions Made:
@@ -23,11 +42,6 @@ __Runtime__: [3 days]: Sat, 0ct 4th, 2025 10:15am  - Tue, Oct 7th, 2025 10:15am
 - [Data Processing + ETL Pipeline](processing.md): Details the steps taken to process the data are in the file `processing.md` in the root directory. Additionally comments have been added through-out the codebase to explain my thinking.
 - 
 
-- [ETL Pipeline](_docs/1_etl_pipeline.md)
-- [Data Quality Checks](_docs/2_data_quality_checks.md)
-- [Data Validation](_docs/3_data_validation.md)
-- [Data Documentation](_docs/4_data_documentation.md)
-- [Deployment & Automation](_docs/5_deployment_automation.md)
 
 
 #### Constraints and Future Work
@@ -40,6 +54,4 @@ A lot more could have been done but the time was insufficient to complete them.
 #### My envisioned solution
 Due to constraints, I scaled down the solution but the image below summarises the key points:
 
-
-
-### RUNNING THIS SOLUTION
+![See images/3_thoughts.jpg](images/3_thoughts.jpg)
