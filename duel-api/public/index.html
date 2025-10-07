@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="duelApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fahid - Duel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        var chart_instance = null;
+        function show_graph (labels, series, series_label) {
+           var ctx = document.getElementById('myChart');
+            if (chart_instance) {
+                chart_instance.destroy();
+            }
+
+           chart_instance = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: series
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {display: false},
+                        title: {
+                            display: true,
+                            text: series_label + " across platforms",
+                            font: {size: 16}
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="app.js"></script>
+    <style>
+
+        .filter-dropdown.active {
+            background-color: #E0E7FF; /* Light blue background */
+            color: #3730A3;            /* Darker blue text */
+            border-color: #C7D2FE;     /* A slightly darker blue border */
+            font-weight: 600;
+        }
+        /* CSS Reset and Basic Styles */
+        :root {
+            --primary-text: #111827;
+            --secondary-text: #6B7280;
+            --border-color: #E5E7EB;
+            --background-color: #F9FAFB;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --green-pill-bg: #D1FAE5;
+            --green-pill-text: #065F46;
+            --blue-badge-bg: #E0E7FF;
+            --blue-badge-text: #3730A3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-text);
+            display: flex;
+        }
+
+        /* Main Layout */
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .sidebar .logo .logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .sidebar nav {
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+        }
+
+        .sidebar nav li a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar nav li a:hover {
+            background-color: #F3F4F6;
+        }
+
+        .sidebar nav li a.active {
+            background-color: #F3F4F6;
+            color: var(--primary-text);
+        }
+
+        .sidebar nav li a .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .sidebar nav li a .badge {
+            margin-left: auto;
+            background-color: var(--blue-badge-bg);
+            color: var(--blue-badge-text);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .sidebar .logout {
+            margin-top: auto;
+        }
+
+        .sidebar .logout a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+
+        .sidebar .logout a .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 32px 48px;
+            overflow-y: auto;
+        }
+
+        /* Main Header */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .main-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: var(--secondary-text);
+        }
+
+        .search-bar input {
+            padding: 10px 10px 10px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            background-color: #DBEAFE;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #1E40AF;
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: var(--secondary-text);
+            margin-top: 4px;
+        }
+
+        .stat-card.raised {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card.raised .stat-group {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .stat-card.raised .stat-secondary {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--secondary-text);
+        }
+
+        .stat-card.raised .arrow-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-text);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Filters and Table Section */
+        .table-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .filter-dropdown {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+
+        .ngo-table {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .ngo-table-header, .ngo-table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr 2fr;
+            align-items: center;
+            padding: 16px 24px;
+        }
+
+        .ngo-table-header {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--secondary-text);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ngo-table-row {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ngo-table-row:last-child {
+            border-bottom: none;
+        }
+
+        .ngo-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .ngo-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .ngo-icon.shelter { background-color: #FEF3C7; color: #92400E; }
+        .ngo-icon.global { background-color: #D1FAE5; color: #065F46; }
+
+        .interest-tags {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            background-color: var(--green-pill-bg);
+            color: var(--green-pill-text);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 16px;
+        }
+
+        /* Footer and Pagination */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--secondary-text);
+        }
+
+        .pagination ul {
+            list-style: none;
+            display: flex;
+            gap: 4px;
+        }
+
+        .pagination li a {
+            display: block;
+            width: 36px;
+            height: 36px;
+            line-height: 34px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--primary-text);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .pagination li a.active,
+        .pagination li a:hover {
+            background-color: #F3F4F6;
+            border-color: #D1D5DB;
+        }
+
+    </style>
+</head>
+<body>
+<div class="dashboard-container" ng-controller="MainCtrl as ctrl" ng-init="ctrl.init()">
+    <aside class="sidebar">
+        <div>
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 6C14.059 6 6 14.059 6 24C6 33.941 14.059 42 24 42V6Z" fill="#84CC16"></path><path d="M24 6C33.941 6 42 14.059 42 24C42 33.941 33.941 42 24 42V6Z" fill="#A3E635"></path></svg>
+                <span>Fahed</span>
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="#" ng-click="ctrl.switch_page('overview')" ng-class="{'active': ctrl.current_page === 'overview'}">
+                            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                            <span>Advocates</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+                            <span>Brands & Programs</span>
+                        </a>
+                    </li>
+
+
+                </ul>
+            </nav>
+        </div>
+
+
+    </aside>
+
+    <main class="main-content">
+        <header class="main-header">
+            <h1>{{ctrl.current_page | uppercase }}</h1>
+        </header>
+
+        <section class="stats-container" ng-if="ctrl.current_page === 'overview'">
+            <div class="stat-card">
+                <div class="stat-value">{{ctrl.overview_data.brands}}</div>
+                <div class="stat-label">Brands</div>
+                <br>
+                <div class="stat-value">{{ctrl.overview_data.programs_count}}</div>
+                <div class="stat-label">Programs</div>
+                <br>
+                <div class="stat-group">
+                    <div class="stat-secondary ">{{ctrl.overview_data.total_comments | number}} Comments</div>
+                    <div class="stat-secondary ">{{ctrl.overview_data.total_likes | number}} Likes</div>
+                    <div class="stat-secondary">{{ctrl.overview_data.total_reach | number}} Reach</div>
+                    <div class="stat-secondary">{{ctrl.overview_data.total_shares | number}} Shares</div>
+                </div>
+
+            </div>
+
+            <div class="stat-card raised">
+                <div>
+                    <div class="stat-label">Raised On Platform</div>
+                    <div class="stat-group">
+                        <div class="stat-value">{{ctrl.overview_data.total_sales_attributed | currency}}</div>
+                        <div class="stat-secondary">{{ctrl.overview_data.platforms_count}} Platforms</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="arrow-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="stats-container" ng-if="ctrl.current_page === 'overview' && ctrl.platform_data_loaded">
+            <h4>Outcome across platforms</h4>
+            <div class="table-controls">
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='activities'}"  ng-click="ctrl.show_performance_graph('activities')" >Activities</div>
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='comments'}" ng-click="ctrl.show_performance_graph('comments')">Comments</div>
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='likes'}" ng-click="ctrl.show_performance_graph('likes')">Likes</div>
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='reach'}" ng-click="ctrl.show_performance_graph('reach')">Reach</div>
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='shares'}" ng-click="ctrl.show_performance_graph('shares')">Shares</div>
+                <div class="filter-dropdown" ng-class="{ 'active': ctrl.selected_outcome =='total_sales_attributed'}"  ng-click="ctrl.show_performance_graph('total_sales_attributed')">Total Sales Attribution</div>
+            </div>
+            <canvas id="myChart" style="width:100%;max-width:700px;max-height:400px">
+            </canvas>
+            <div>
+
+            </div>
+        </section>
+
+
+
+
+
+
+    </main>
+</div>
+</body>
+
+</html>

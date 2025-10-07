@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html ng-app="duelApp">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+<div ng-controller="MainCtrl as ctrl" ng-init="ctrl.init()">
+
+    <div ng-if="ctrl.current_page === 'overview'">
+        <h2>Overview Data</h2>
+        <p>{{ctrl.overview_data.programs_count}}</p>
+
+
+        "programs_count": 5098,
+        "activities_count": 4978,
+        "platforms_count": 3,
+        "brands": 4448,
+        "total_likes": 1275915,
+        "total_reach": 26585090,
+        "total_shares": 256396,
+        "total_sales_attributed": 12795007.045679118
+    </div>
+
+
+    <h1>Advocate Rankings</h1>
+    <ul>
+        <li ng-repeat="advocate in advocates">
+            {{advocate.name}} - {{advocate.total_sales_attributed}}
+        </li>
+    </ul>
+</div>
+</body>
+</html>
